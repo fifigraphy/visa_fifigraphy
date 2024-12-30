@@ -1,0 +1,83 @@
+<div class="visa-checker">
+    <h2>Visa Requirement Checker</h2>
+
+    <label for="nationality">Select Your Nationality:</label>
+    <select id="nationality">
+        <option value="" disabled selected>Select your nationality</option>
+        <option value="afghanistan">Afghanistan</option>
+        <option value="albania">Albania</option>
+        <option value="algeria">Algeria</option>
+        <option value="andorra">Andorra</option>
+        <option value="angola">Angola</option>
+    </select>
+
+    <label for="destination">Select Your Destination:</label>
+    <select id="destination">
+        <option value="" disabled selected>Select your destination</option>
+        <option value="albania">Albania</option>
+        <option value="algeria">Algeria</option>
+        <option value="andorra">Andorra</option>
+        <option value="angola">Angola</option>
+        <option value="argentina">Argentina</option>
+    </select>
+
+    <button onclick="checkVisa()">Check</button>
+    <div id="result" style="margin-top: 20px;"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+<script>
+    let visaData = [];
+
+    // Fetch the CSV file from the raw GitHub URL
+    fetch('https://raw.githubusercontent.com/fifigraphy/visa_checker/refs/heads/main/passport-index-tidy.csv?token=GHSAT0AAAAAAC4SP4QTTD3P5EHQNVHRNES6Z3TATUQ')
+        .then(response => response.text())
+        .then(csvText => {
+            // Parse the CSV data using PapaParse
+            Papa.parse(csvText, {
+                header: true, // Use the first row as headers
+                complete: function(results) {
+                    console.log('Parsed Data:', results.data); // Log the parsed data
+
+                    // Normalize and clean the data
+                    visaData = results.data
+                        .filter(entry => entry.nationality && entry.destination && entry.requirement)
+                        .map(entry => ({
+                            nationality: entry.nationality.trim().toLowerCase(),
+                            destination: entry.destination.trim().toLowerCase(),
+                            requirement: entry.requirement.trim()
+                        }));
+
+                    console.log('Cleaned Visa Data:', visaData);
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching CSV:', error);
+            document.getElementById('result').innerHTML = '<p><strong>Error:</strong> Unable to fetch visa data. Please try again later.</p>';
+        });
+
+    function checkVisa() {
+        const nationalityInput = document.getElementById('nationality').value.toLowerCase();
+        const destinationInput = document.getElementById('destination').value.toLowerCase();
+
+        console.log('Selected Nationality:', nationalityInput);
+        console.log('Selected Destination:', destinationInput);
+
+        const resultDiv = document.getElementById('result');
+
+        const match = visaData.find(
+            entry =>
+                entry.nationality === nationalityInput &&
+                entry.destination === destinationInput
+        );
+
+        console.log('Matching Entry:', match);
+
+        if (match) {
+            resultDiv.innerHTML = `<p><strong>Requirement:</strong> ${match.requirement}</p>`;
+        } else {
+            resultDiv.innerHTML = `<p><strong>Requirement:</strong> No requirement found</p>`;
+        }
+    }
+</script>
