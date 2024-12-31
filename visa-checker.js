@@ -11,6 +11,8 @@ fetch('https://raw.githubusercontent.com/fifigraphy/visa_fifigraphy/refs/heads/m
         return response.text();
     })
     .then(csvText => {
+        console.log('Raw CSV fetched successfully:', csvText); // Log raw CSV content
+
         // Normalize line endings
         csvText = csvText.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
 
@@ -19,6 +21,8 @@ fetch('https://raw.githubusercontent.com/fifigraphy/visa_fifigraphy/refs/heads/m
             header: true,
             skipEmptyLines: true,
             complete: function (results) {
+                console.log('Parsed CSV Data:', results.data); // Log parsed data
+
                 // Trim and process the data
                 visaData = results.data.map(entry => ({
                     nationality: entry.nationality?.trim(),
@@ -32,17 +36,20 @@ fetch('https://raw.githubusercontent.com/fifigraphy/visa_fifigraphy/refs/heads/m
                     if (entry.destination) destinations.add(entry.destination);
                 });
 
+                console.log('Unique Nationalities:', Array.from(nationalities)); // Log nationalities
+                console.log('Unique Destinations:', Array.from(destinations)); // Log destinations
+
                 // Populate dropdowns
                 populateDropdown('nationality', Array.from(nationalities));
                 populateDropdown('destination', Array.from(destinations));
             },
             error: function (error) {
-                console.error('PapaParse Error:', error);
+                console.error('PapaParse Error:', error); // Log parsing error
             }
         });
     })
     .catch(error => {
-        console.error('Fetch Error:', error);
+        console.error('Fetch Error:', error); // Log fetch error
     });
 
 // Populate dropdowns with data
