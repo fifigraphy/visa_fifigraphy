@@ -1,30 +1,18 @@
 let visaData = [];
 let nationalities = new Set();
 let destinations = new Set();
-
-// Fetch the CSV file
-fetch('https://raw.githubusercontent.com/fifigraphy/visa_fifigraphy/refs/heads/main/passport-index-tidy.csv')
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.text();
-    })
-    .then(csvText => {
-        console.log('Raw CSV fetched successfully:', csvText); // Log raw CSV content
-
-        // Normalize line endings
-        csvText = csvText.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-
-        // Parse the CSV using PapaParse
-        Papa.parse(csvText, {
-            header: true,
-            skipEmptyLines: true,
-            complete: function (results) {
-                console.log('Parsed CSV Data:', results.data); // Log parsed data
-
-                // Trim and process the data
-                visaData = results.data.map(entry => ({
+const csvText = `nationality,destination,requirement
+Afghanistan,Albania,e-visa
+Afghanistan,Algeria,visa required
+Afghanistan,Andorra,visa required`;
+// Parse the CSV using PapaParse
+Papa.parse(csvText, {
+    header: true,
+    skipEmptyLines: true,
+    complete: function (results) {
+        console.log('Parsed CSV Data:', results.data); // Log parsed data 
+        //Trim and process the data
+        visaData = results.data.map(entry => ({
                     nationality: entry.nationality?.trim(),
                     destination: entry.destination?.trim(),
                     requirement: entry.requirement?.trim()
@@ -88,3 +76,5 @@ function checkVisa() {
         resultDiv.innerHTML = '<p><strong>Requirement:</strong> No requirement found. Please check the selected options.</p>';
     }
 }
+
+                
