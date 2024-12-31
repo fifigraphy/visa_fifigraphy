@@ -1,44 +1,38 @@
 let visaData = [];
 let nationalities = new Set();
 let destinations = new Set();
+
 const csvText = `nationality,destination,requirement
 Afghanistan,Albania,e-visa
 Afghanistan,Algeria,visa required
 Afghanistan,Andorra,visa required`;
+
 // Parse the CSV using PapaParse
 Papa.parse(csvText, {
     header: true,
     skipEmptyLines: true,
     complete: function (results) {
-        console.log('Parsed CSV Data:', results.data); // Log parsed data 
-        //Trim and process the data
+        // Process the parsed data
         visaData = results.data.map(entry => ({
-                    nationality: entry.nationality?.trim(),
-                    destination: entry.destination?.trim(),
-                    requirement: entry.requirement?.trim()
-                }));
+            nationality: entry.nationality?.trim(),
+            destination: entry.destination?.trim(),
+            requirement: entry.requirement?.trim()
+        }));
 
-                // Extract unique nationalities and destinations
-                visaData.forEach(entry => {
-                    if (entry.nationality) nationalities.add(entry.nationality);
-                    if (entry.destination) destinations.add(entry.destination);
-                });
-
-                console.log('Unique Nationalities:', Array.from(nationalities)); // Log nationalities
-                console.log('Unique Destinations:', Array.from(destinations)); // Log destinations
-
-                // Populate dropdowns
-                populateDropdown('nationality', Array.from(nationalities));
-                populateDropdown('destination', Array.from(destinations));
-            },
-            error: function (error) {
-                console.error('PapaParse Error:', error); // Log parsing error
-            }
+        // Extract unique nationalities and destinations
+        visaData.forEach(entry => {
+            if (entry.nationality) nationalities.add(entry.nationality);
+            if (entry.destination) destinations.add(entry.destination);
         });
-    })
-    .catch(error => {
-        console.error('Fetch Error:', error); // Log fetch error
-    });
+
+        // Populate dropdowns
+        populateDropdown('nationality', Array.from(nationalities));
+        populateDropdown('destination', Array.from(destinations));
+    },
+    error: function (error) {
+        console.error('PapaParse Error:', error);
+    }
+});
 
 // Populate dropdowns with data
 function populateDropdown(dropdownId, items) {
@@ -76,5 +70,6 @@ function checkVisa() {
         resultDiv.innerHTML = '<p><strong>Requirement:</strong> No requirement found. Please check the selected options.</p>';
     }
 }
+
 
                 
